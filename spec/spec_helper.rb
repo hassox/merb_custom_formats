@@ -7,7 +7,7 @@ require 'merb-core/test'
 require 'merb-core/dispatch/session'
 require 'spec' # Satisfies Autotest and anyone else not using the Rake tasks
 
-require 'merb-custom-formats'
+require 'merb_custom_formats'
 
 Merb.start  :environment    => "test", 
             :adapter        => "runner", 

@@ -5,7 +5,7 @@ require "spec/rake/spectask"
 require 'merb-core'
 require 'merb-core/tasks/merb'
 
-GEM_NAME = "merb-custom-formats"
+GEM_NAME = "merb_custom_formats"
 GEM_VERSION = "0.1.0"
 AUTHOR = "Daniel Neighman"
 EMAIL = "has.sox@gmail.com"

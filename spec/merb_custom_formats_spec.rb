@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper'
 require File.dirname(__FILE__) + '/controllers'
 
-describe "merb-custom-formats" do
+describe "merb_custom_formats" do
   
   before(:each) do
     Merb::CustomFormats.clear_custom_formats!
