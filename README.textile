@@ -1,0 +1,77 @@
+h1. merb-custom-formats
+
+
+Proivdes simple setup for custom formats in merb.  You can use Merb::CustomFormats as a descriptive 
+way to configure new mime types in merb.  The plugin also provides a way for you to execute arbitrary logic
+easily to set your format from any information available in the request.
+
+h2. Declaring A Mime Type
+
+To declare a new mime type simply add it and declare which mime_types are acceptable for the format
+
+<pre><code>
+Merb::CustomFormats.add(:iphone) do
+  mime_types "application/xhtml+xml"
+end
+</code></pre>
+
+This will setup the :iphone format for use in Merb via 
+    provides :iphone
+
+The only required step is to declare the _mime_types_ but you can also specify the 
+default response headers, transform (serialization) method, quality and a custom format selector.
+By default the transform_method is @:"to_#{format}"@
+
+h2. Expanded Example
+
+Here's an example showing all things in play
+<pre><code>
+Merb::CustomFormats.add(:iphone) do
+  mime_types        "application/xhtml+xml", "text/xml"
+  transform_method  :to_iphone_data
+  headers           :some => "default header"
+  quality           0.45
+  selector do |request, route_params|
+    request.user_agent && request.user_agent =~ /iphone/i
+  end
+end
+</code></pre>
+
+ You can see here that there are multiple mime_types being set, custom transform method, etc.  
+
+h2. Selectors
+
+The selector is a block that is run in the router as arbitrary logic to determine if the format matches
+By returning true, you're asserting a match, and params[:format] and therefore content_type will be (in this case)
+:iphone  If on the other hand you return false, the next custom format selector will be tried.  
+You don't have to provide a selector, and if you don't, a normal mime type will be added to merb.
+
+To use in the router, just add a custom_format block around the routes you want to apply it to
+
+<pre><code>
+Merb::Router.prepare do
+  custom_formats do
+    resources :iphone_resources
+    match("/foo").to(:controller => "bar")
+  end
+  resources :non_iphone_resources
+end
+</code></pre>
+
+This will check the format on the _:iphone_resources route_, and also the "/foo" route.  I will not try to match the 
+custom formats on the _:non_iphone_resources_ routes.
+
+h2. Using this in your controller and views
+
+All this is well and good.  But what good does it actually do in your application?
+
+The above example lets you do this:
+
+<pre><code>
+class MyController < Application
+  provides :iphone
+  
+end
+</code></pre>
+
+All action and class level provides are respected with this method.
