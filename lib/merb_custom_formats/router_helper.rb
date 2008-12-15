@@ -2,8 +2,9 @@ Merb::Router.extensions do
   
   # Wrap your routes 
   def custom_formats(*formats, &block)
+    custom_options_format = extract_options_from_args!(formats) || {}
     p = Proc.new do |request, params|
-      if params[:format]
+      if params[:format] && !custom_options_format[:force]
         params
       else
         formats_to_run = if formats.empty?

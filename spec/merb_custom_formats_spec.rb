@@ -110,6 +110,14 @@ describe "merb_custom_formats" do
             match("/foo_for_iphone").register
           end
         
+          custom_formats(:force => true) do
+            match("/force_all(.:format)").register
+          end
+          
+          custom_formats(:iphone, :force => true) do
+            match("/force_iphone(.:format)").register
+          end
+          
           match("/foo_with_no_custom_formats").register
         end
       end
@@ -144,7 +152,6 @@ describe "merb_custom_formats" do
     
     it "should check all formats registered with selectors" do
       response = request("/foo")
-      puts Merb::CustomFormats.router_procs.keys.inspect
       response.should be_successful
       Viking.captures.should include(:iphone)
       Viking.captures.should include(:android)
@@ -153,7 +160,6 @@ describe "merb_custom_formats" do
     
     it "should set the format to :html if there is nothing matching" do
       response = request("/foo")
-      puts response.body.to_s
       response.body.should == ":html"
     end
     
@@ -184,7 +190,7 @@ describe "merb_custom_formats" do
     end
     
     it "should not run any selectors when the format is already set" do
-      response = request("/foo.yaml", "User-Agent" => @iphone_ua)
+      response = request("/foo.yaml", "User-Agent" => @iphone_ua)      
       response.body.should == ":yaml"
       Viking.captures.should_not include(:iphone)
       Viking.captures.should_not include(:android)
@@ -196,6 +202,21 @@ describe "merb_custom_formats" do
       Viking.captures.should_not include(:iphone)
       Viking.captures.should_not include(:android)
     end
+    
+    it "should force check the custom formats when a format is set via .format" do
+      response = request("/force_all.xml")
+      response.body.should == ":xml"
+      Viking.captures.should include(:iphone)
+      Viking.captures.should include(:android)
+    end
+    
+    it "should force check the custom formats for a particular format" do
+      response = request("/force_iphone.xml")
+      response.body.should == ":xml"
+      Viking.captures.should include(:iphone)
+      Viking.captures.should_not include(:android)
+    end
+    
   end
    
 end
